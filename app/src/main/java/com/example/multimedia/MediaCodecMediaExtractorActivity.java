@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,9 +12,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 
-import java.io.IOException;
-
-public class MediaPlayerActivity extends Activity {
+public class MediaCodecMediaExtractorActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath;
     private SurfaceView surfaceView;
@@ -51,16 +48,8 @@ public class MediaPlayerActivity extends Activity {
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MediaPlayer mp = new MediaPlayer();
-                try {
-                    mp.setDataSource(filePath);
-                    mp.setDisplay(surfaceHolder);
-                    mp.prepare();
-                    mp.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                AVplayer avplayer = new AVplayer(filePath, surfaceView.getHolder().getSurface());
+                avplayer.playMediaFile();
             }
         });
     }

@@ -5,7 +5,6 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -41,7 +40,9 @@ public class MainActivity extends ListActivity {
             intent.setClass(MainActivity.this, MediaPlayerActivity.class);
             startActivity(intent);
         } else if (position == 1) {
-            Log.d("yangliu","1");
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, MediaCodecMediaExtractorActivity.class);
+            startActivity(intent);
         }
     }
 
