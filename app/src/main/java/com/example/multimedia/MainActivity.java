@@ -43,6 +43,10 @@ public class MainActivity extends ListActivity {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, MediaCodecMediaExtractorActivity.class);
             startActivity(intent);
+        } else if (position == 2) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, ExoplayerActivity.class);
+            startActivity(intent);
         }
     }
 

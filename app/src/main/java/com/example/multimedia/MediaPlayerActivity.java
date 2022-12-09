@@ -19,7 +19,6 @@ public class MediaPlayerActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath;
     private SurfaceView surfaceView;
-    private SurfaceHolder surfaceHolder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,19 +26,16 @@ public class MediaPlayerActivity extends Activity {
         surfaceView = findViewById(R.id.sfView);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                surfaceHolder = holder;
-            }
+            public void surfaceCreated(SurfaceHolder holder) {}
+
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
-            }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
+            public void surfaceDestroyed(SurfaceHolder holder) {}
 
-            }
         });
         findViewById(R.id.selectvideo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,18 +47,21 @@ public class MediaPlayerActivity extends Activity {
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MediaPlayer mp = new MediaPlayer();
-                try {
-                    mp.setDataSource(filePath);
-                    mp.setDisplay(surfaceHolder);
-                    mp.prepare();
-                    mp.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                startPlayer(filePath);
             }
         });
+    }
+
+    private void startPlayer(String filepath) {
+        MediaPlayer mp = new MediaPlayer();
+        try {
+            mp.setDataSource(filepath);
+            mp.setDisplay(surfaceView.getHolder());
+            mp.prepare();
+            mp.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

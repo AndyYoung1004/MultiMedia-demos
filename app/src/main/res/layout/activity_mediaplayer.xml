@@ -16,7 +16,7 @@
         android:layout_height="60dp"
         android:layout_marginLeft="100dp"
         android:id="@+id/play"
-        android:text="播放"/>
+        android:text="mp播放"/>
 
     <SurfaceView
         android:layout_width="match_parent"
