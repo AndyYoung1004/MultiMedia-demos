@@ -24,16 +24,18 @@ public class MainActivity extends ListActivity {
     private final int TBL_PLAYER_ACTIVITY = 3;
     private final int GL_SFVIEW_ACTIVITY = 4;
     private final int GL_PICTURE_ACTIVITY = 5;
+    private final int GL_CAMERA_PICTURE_ACTIVITY = 6;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         List<String> displayList = new ArrayList<>();
-        displayList.add("mediaplayer");
-        displayList.add("mediacodec+mediaextractor");
-        displayList.add("exoplayer");
-        displayList.add("TBLPlayer");
-        displayList.add("GLSurfaceView");
-        displayList.add("GLPicture");
+        displayList.add("mediaplayer播放视频");
+        displayList.add("mediacodec+mediaextractor播放视频");
+        displayList.add("exoplayer播放视频");
+        displayList.add("TBLPlayer播放视频");
+        displayList.add("GLSurfaceView播放视频");
+        displayList.add("GLPicture播放图片");
+        displayList.add("相机预览拍摄图片");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, displayList);
         setListAdapter(adapter);
@@ -67,6 +69,10 @@ public class MainActivity extends ListActivity {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, GLPictureActivity.class);
             startActivity(intent);
+        } else if (position == GL_CAMERA_PICTURE_ACTIVITY) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, GLCameraPictureActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -74,10 +80,12 @@ public class MainActivity extends ListActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PermissionChecker.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+                            Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.CAMERA}, 0);
             return false;
         }
         return true;
