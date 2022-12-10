@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -16,10 +17,11 @@ public class MediaCodecMediaExtractorActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath;
     private SurfaceView surfaceView;
+    AVplayer avplayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mediaplayer);
+        setContentView(R.layout.activity_mediacodecmediaextractor);
         surfaceView = findViewById(R.id.sfView);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -29,7 +31,9 @@ public class MediaCodecMediaExtractorActivity extends Activity {
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {}
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                releasePlayer();
+            }
 
         });
         findViewById(R.id.selectvideo).setOnClickListener(new View.OnClickListener() {
@@ -45,11 +49,23 @@ public class MediaCodecMediaExtractorActivity extends Activity {
                 startPlayer(filePath);
             }
         });
+        findViewById(R.id.release).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                releasePlayer();
+            }
+        });
     }
 
     private void startPlayer(String filepath) {
-        AVplayer avplayer = new AVplayer(filepath, surfaceView.getHolder().getSurface());
+        avplayer = new AVplayer(filepath, surfaceView.getHolder().getSurface());
         avplayer.playMediaFile();
+    }
+
+    private void releasePlayer() {
+        if (avplayer != null) {
+            avplayer.releasePlayer();
+        }
     }
 
     @Override
@@ -72,5 +88,11 @@ public class MediaCodecMediaExtractorActivity extends Activity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
     }
 }

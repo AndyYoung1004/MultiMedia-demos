@@ -2,10 +2,13 @@ package com.example.multimedia;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
+import android.util.Log;
 import android.view.Surface;
 
 import java.io.IOException;
@@ -18,13 +21,14 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         SurfaceTexture.OnFrameAvailableListener, MediaPlayer.OnVideoSizeChangedListener {
-    private int programId;
+    private static final String TAG = "GLRenderer";
     private Context context;
-    private String videoPath;
-    private FloatBuffer vertexBuffer, textureBuffer;
-    private MediaPlayer mediaPlayer;
+
+    private int programId;
     private int aPositionLocation;
     private int uMatrixLocation;
+    private FloatBuffer vertexBuffer;
+    private FloatBuffer textureBuffer;
     private final float[] vertexCoordinate = {
             1f, -1f, 0f,
             -1f, -1f, 0f,
@@ -44,15 +48,20 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
     private int textureId;
 
     private SurfaceTexture surfaceTexture;
+    private MediaPlayer mediaPlayer;
     private float[] mSTMatrix = new float[16];
     private int uSTMMatrixHandle;
 
     private boolean updateSurface;
     private int screenWidth, screenHeight;
+    private String videoPath;
 
     public GLSurfaceViewRenderer(Context context, String videoPath) {
         this.context = context;
         this.videoPath = videoPath;
+        synchronized (this) {
+            updateSurface = false;
+        }
         vertexBuffer = ByteBuffer.allocateDirect(vertexCoordinate.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
@@ -64,12 +73,12 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
                 .asFloatBuffer()
                 .put(textureCoordinate);
         textureBuffer.position(0);
+
         initMediaPlayer();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        // 1.编译shader
         String vertexShader = ShaderUtils.readRawTextFile(context, R.raw.vetext_sharder);
         String fragmentShader = ShaderUtils.readRawTextFile(context, R.raw.fragment_sharder);
         programId = ShaderUtils.createProgram(vertexShader, fragmentShader);
@@ -79,7 +88,7 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         uSTMMatrixHandle = GLES20.glGetUniformLocation(programId, "uSTMatrix");
         uTextureSamplerLocation = GLES20.glGetUniformLocation(programId, "sTexture");
         aTextureCoordLocation = GLES20.glGetAttribLocation(programId, "aTexCoord");
-        // 2.生成纹理并绑定
+
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
 
@@ -101,10 +110,30 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         mediaPlayer.setSurface(surface);
     }
 
+    private void initMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(videoPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setLooping(false);
+        mediaPlayer.setOnVideoSizeChangedListener(this);
+    }
+
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        Log.d(TAG, "onSurfaceChanged: " + width + " " + height);
         screenWidth = width;
         screenHeight = height;
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.start();
+            }
+        });
     }
 
     @Override
@@ -138,29 +167,21 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
     }
 
     @Override
-    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+    synchronized public void onFrameAvailable(SurfaceTexture surface) {
         updateSurface = true;
     }
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-
+        updateProjection(width, height);
     }
 
-    private void initMediaPlayer() {
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(videoPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.setOnVideoSizeChangedListener(this);
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-            }
-        });
-        mediaPlayer.prepareAsync();
+    private void updateProjection(int videoWidth, int videoHeight) {
+        float screenRatio = (float) screenWidth / screenHeight;
+        float videoRatio = (float) videoWidth / videoHeight;
+        if (videoRatio > screenRatio) {
+            Matrix.orthoM(projectionMatrix, 0, -1f, 1f, -videoRatio / screenRatio, videoRatio / screenRatio, -1f, 1f);
+        } else
+            Matrix.orthoM(projectionMatrix, 0, -screenRatio / videoRatio, screenRatio / videoRatio, -1f, 1f, -1f, 1f);
     }
 }

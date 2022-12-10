@@ -17,6 +17,12 @@
         android:layout_marginLeft="100dp"
         android:id="@+id/play"
         android:text="codec播放"/>
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="200dp"
+        android:id="@+id/release"
+        android:text="codec停止"/>
 
     <SurfaceView
         android:layout_width="match_parent"

@@ -28,11 +28,14 @@ public class AVplayer {
         this.surface = surface;
     }
 
+    public void releasePlayer() {
+        isPlaying = false;
+    }
+
     // 处理视频通道
     private class VideoThread extends Thread {
 
         private boolean isVideoOver = false;
-        int frameIndex = 0;
 
         @Override
         public void run() {
@@ -70,7 +73,7 @@ public class AVplayer {
                 // 当前Thread 没有被中断
                 while (!Thread.interrupted()) {
                     if (!isPlaying) {
-                        continue;
+                        return;
                     }
 
                     if (!isVideoOver) {
@@ -98,8 +101,6 @@ public class AVplayer {
 
                             //渲染为true就会渲染到surface   configure() 设置的surface
                             mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
-                            frameIndex ++;
-                            Log.v(TAG, "frameIndex   " + frameIndex);
                             break;
                     }
 
@@ -185,7 +186,7 @@ public class AVplayer {
 
             while (!Thread.interrupted()) {
                 if (!isPlaying) {
-                    continue;
+                    return;
                 }
                 if (!isAudioEOS) {
                     isAudioEOS = putBufferToMediaCodec(audioExtractor, audioCodec, inputBuffers);

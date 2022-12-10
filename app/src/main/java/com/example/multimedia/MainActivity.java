@@ -18,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ListActivity {
-
+    private final int MEDIA_PLAYER_ACTIVITY = 0;
+    private final int MEDIA_CODEC_ACTIVITY = 1;
+    private final int EXO_PLAYER_ACTIVITY = 2;
+    private final int TBL_PLAYER_ACTIVITY = 3;
+    private final int GL_SFVIEW_ACTIVITY = 4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,33 +41,25 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        if (position == 0) {
+        if (position == MEDIA_PLAYER_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, MediaPlayerActivity.class);
             startActivity(intent);
-        } else if (position == 1) {
+        } else if (position == MEDIA_CODEC_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, MediaCodecMediaExtractorActivity.class);
             startActivity(intent);
-        } else if (position == 2) {
+        } else if (position == EXO_PLAYER_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, ExoplayerActivity.class);
             startActivity(intent);
-        } else if (position == 3) {
+        } else if (position == TBL_PLAYER_ACTIVITY) {
+//            Intent intent = new Intent();
+//            intent.setClass(MainActivity.this, GLSurfaceViewActivity.class);
+//            startActivity(intent);
+        } else if (position == GL_SFVIEW_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, GLSurfaceViewActivity.class);
-            startActivity(intent);
-        } else if (position == 4) {
-            Intent intent = new Intent();
-            intent.setClass(MainActivity.this, ExoplayerActivity.class);
-            startActivity(intent);
-        } else if (position == 5) {
-            Intent intent = new Intent();
-            intent.setClass(MainActivity.this, ExoplayerActivity.class);
-            startActivity(intent);
-        } else if (position == 6) {
-            Intent intent = new Intent();
-            intent.setClass(MainActivity.this, ExoplayerActivity.class);
             startActivity(intent);
         }
     }

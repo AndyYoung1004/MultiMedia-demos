@@ -30,7 +30,7 @@ public class ExoplayerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mediaplayer);
+        setContentView(R.layout.activity_exoplayer);
         surfaceView = findViewById(R.id.sfView);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
