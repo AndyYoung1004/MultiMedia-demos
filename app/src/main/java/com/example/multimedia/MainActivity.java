@@ -23,6 +23,7 @@ public class MainActivity extends ListActivity {
     private final int EXO_PLAYER_ACTIVITY = 2;
     private final int TBL_PLAYER_ACTIVITY = 3;
     private final int GL_SFVIEW_ACTIVITY = 4;
+    private final int GL_PICTURE_ACTIVITY = 5;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +33,7 @@ public class MainActivity extends ListActivity {
         displayList.add("exoplayer");
         displayList.add("TBLPlayer");
         displayList.add("GLSurfaceView");
+        displayList.add("GLPicture");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, displayList);
         setListAdapter(adapter);
@@ -60,6 +62,10 @@ public class MainActivity extends ListActivity {
         } else if (position == GL_SFVIEW_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, GLSurfaceViewActivity.class);
+            startActivity(intent);
+        } else if (position == GL_PICTURE_ACTIVITY) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, GLPictureActivity.class);
             startActivity(intent);
         }
     }

@@ -23,6 +23,7 @@
         <activity android:name=".MediaCodecMediaExtractorActivity"/>
         <activity android:name=".ExoplayerActivity"/>
         <activity android:name=".GLSurfaceViewActivity"/>
+        <activity android:name=".GLPictureActivity"/>
     </application>
 
 </manifest>
