@@ -82,12 +82,12 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         String vertexShader = ShaderUtils.readRawTextFile(context, R.raw.vetext_sharder);
         String fragmentShader = ShaderUtils.readRawTextFile(context, R.raw.fragment_sharder);
         programId = ShaderUtils.createProgram(vertexShader, fragmentShader);
-        aPositionLocation = GLES20.glGetAttribLocation(programId, "aPosition");
+        aPositionLocation = GLES20.glGetAttribLocation(programId, "aPosition");//顶点坐标handle
 
-        uMatrixLocation = GLES20.glGetUniformLocation(programId, "uMatrix");
-        uSTMMatrixHandle = GLES20.glGetUniformLocation(programId, "uSTMatrix");
+        uMatrixLocation = GLES20.glGetUniformLocation(programId, "uMatrix");//顶点矩阵handle
+        uSTMMatrixHandle = GLES20.glGetUniformLocation(programId, "uSTMatrix");//纹理矩阵handle
         uTextureSamplerLocation = GLES20.glGetUniformLocation(programId, "sTexture");
-        aTextureCoordLocation = GLES20.glGetAttribLocation(programId, "aTexCoord");
+        aTextureCoordLocation = GLES20.glGetAttribLocation(programId, "aTexCoord");//纹理坐标handle
 
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
@@ -158,10 +158,10 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         GLES20.glEnableVertexAttribArray(aTextureCoordLocation);
         GLES20.glVertexAttribPointer(aTextureCoordLocation, 2, GLES20.GL_FLOAT, false, 8, textureBuffer);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
 
-        GLES20.glUniform1i(uTextureSamplerLocation, 0);
+        GLES20.glUniform1i(uTextureSamplerLocation, 1);
         GLES20.glViewport(0, 0, screenWidth, screenHeight);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
