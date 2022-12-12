@@ -95,7 +95,7 @@ public class GLPictureActivity extends Activity {
         public void onDrawFrame(GL10 gl) { // 绘制
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
             // 根据纹理id，顶点和纹理坐标数据绘制图片
-            mGLImageHandler.onDraw(mGLTextureId, mGLCubeBuffer, mGLTextureBuffer);
+            mGLImageHandler.onDraw(mGLCubeBuffer, mGLTextureBuffer);
         }
 
         // 调整图片显示大小为居中显示
