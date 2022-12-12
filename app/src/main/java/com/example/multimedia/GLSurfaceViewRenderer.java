@@ -149,6 +149,7 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         GLES20.glUseProgram(programId);
         GLES20.glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
         GLES20.glUniformMatrix4fv(uSTMMatrixHandle, 1, false, mSTMatrix, 0);
+        //
         vertexBuffer.position(0);
         GLES20.glEnableVertexAttribArray(aPositionLocation);
         GLES20.glVertexAttribPointer(aPositionLocation, 3, GLES20.GL_FLOAT, false,
@@ -157,11 +158,12 @@ public class GLSurfaceViewRenderer implements GLSurfaceView.Renderer,
         textureBuffer.position(0);
         GLES20.glEnableVertexAttribArray(aTextureCoordLocation);
         GLES20.glVertexAttribPointer(aTextureCoordLocation, 2, GLES20.GL_FLOAT, false, 8, textureBuffer);
+        //
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);//激活纹理1，那视频的输出纹理就会到纹理1
+//        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);//
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
-
-        GLES20.glUniform1i(uTextureSamplerLocation, 1);
+        GLES20.glUniform1i(uTextureSamplerLocation, 1);//表示从绑定的texture1中取出纹理
+        //
         GLES20.glViewport(0, 0, screenWidth, screenHeight);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
