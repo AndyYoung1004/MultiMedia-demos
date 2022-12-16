@@ -26,6 +26,7 @@
         <activity android:name=".GLSurfaceViewActivity"/>
         <activity android:name=".GLPictureActivity"/>
         <activity android:name=".GLCameraPictureActivity"/>
+        <activity android:name=".FBOActivity"/>
     </application>
 
 </manifest>
