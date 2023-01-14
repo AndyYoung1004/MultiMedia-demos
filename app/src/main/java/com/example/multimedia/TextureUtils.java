@@ -16,10 +16,10 @@ public class TextureUtils {
         bitmapSize.set(bitmap.getWidth(), bitmap.getHeight());
 
         // 生成纹理id
-        GLES30.glGenTextures(2, textureId, 0);
+        GLES30.glGenTextures(2, textureId, 0);//生成2个纹理ID
         for (int i = 0; i < 2; i++) {
             // 绑定纹理到OpenGL
-            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureId[i]);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureId[i]);//接下来所有对2D操作的，都会作用到这个id上面
             GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST);
             GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
             GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
@@ -37,7 +37,7 @@ public class TextureUtils {
         }
         // 创建帧缓存id
         GLES30.glGenFramebuffers(1, frameBufferId, 0);
-        // 绑定帧缓存
+        // 绑定帧缓存，表示这个fbo是一个framebuffer，后面操作的framebuffer都是这个id
         GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId[0]);
         // 将第二个纹理附着在帧缓存的颜色附着点上
         GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, textureId[1], 0);

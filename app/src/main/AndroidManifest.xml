@@ -27,6 +27,7 @@
         <activity android:name=".GLPictureActivity"/>
         <activity android:name=".GLCameraPictureActivity"/>
         <activity android:name=".FBOActivity"/>
+        <activity android:name=".NDKPlayerActivity"/>
     </application>
 
 </manifest>

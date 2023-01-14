@@ -40,4 +40,33 @@ android目前默认是32个纹理单元，glActiveTexture默认激活纹理单�
 总结：
 openGL中纹理的状态分为texture unit和texture object包含的状态。texture unit的状态包括当前激活的unit，每个unit下面的各个target分别指向哪些texture object。texture object的状态包含type, texParam, format等等。什么时候需要调用glActiveTexture以及glBindTexture就要看状态是否会改变。对于shader来说，他可以访问所有的texture unit中指定的texture object。只要你告诉他每个sampler使用哪个unit就行。如果每个unit的内容指定后不需要改变，则即便shader使用了多个sampler也不需要来回切换unit的状态。当然更常见的是渲染完一个pass后，需要改变当前texture unit中某target中的texture object，也就是需要换贴图了。那么标准的操作就是先glActiveTexture，然后glBindTexture。当然如果你只使用unit0，则不需要调用glActiveTexture。
 
+VAO:vertex array object 顶点数组对象
+VBO:vertex buffer object 顶点缓冲对象
+EBO:Element buffer object 索引缓冲对象
+FBO:framebuffer object 帧缓冲对象
+RBO:renderbuffer object 渲染缓冲对象
+TEXTURE:纹理
+
+
+API:
+glGenTextures是用来生成纹理的函数。函数根据纹理参数返回n个纹理索引
+glBindTexture实际上是改变了OpenGL的这个状态，它告诉OpenGL下面对纹理的任何操作都是对它所绑定的纹理对象的，比如glBindTexture(GL_TEXTURE_2D,1)告诉OpenGL下面代码中对2D纹理的任何设置都是针对索引为1的纹理的
+GLUtils.texImage2D把一个bitmap加载到已绑定的纹理中
+glTexImage2D 根据指定参数，生成一个2D纹理texture
+glGenFrameBuffer glGenFramebuffers在framebuffers中返回n个帧缓冲区对象名。无法保证连续整数的名称; 但是，保证在调用glGenFramebuffers之前没有任何返回的名称被使用。
+调用glGenFramebuffers返回的帧缓冲对象名称不会被后续调用返回，除非它们首先使用glDeleteFramebuffers删除。
+没有帧缓冲对象与返回的帧缓冲区对象名称关联，直到它们首先通过调用glBindFramebuffer进行绑定。
+glBindFramebuffer 指定绑定操作的帧缓冲区目标
+glFramebufferTexture2D  将纹理图像附加到帧缓冲对象，texture->fbo
+
+
+
+知识点理解：
+纹理是一个2D图片（甚至也有1D和3D的纹理），它可以用来添加物体的细节。
+为了能够把纹理映射(Map)到三角形上，我们需要指定三角形的每个顶点各自对应纹理的哪个部分。这样每个顶点就会关联着一个纹理坐标(Texture Coordinate），用来标明该从纹理图像的哪个部分采样（译注：采集片段颜色）。之后在图形的其它片段上进行片段插值(Fragment Interpolation)。
+纹理坐标在x和y轴上，范围为0到1之间（注意我们使用的是2D纹理图像
+使用纹理坐标获取纹理颜色叫做采样(Sampling)
+纹理坐标起始于(0, 0)，也就是纹理图片的左下角，终始于(1, 1)，即纹理图片的右上角
+
+
 
