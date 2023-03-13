@@ -68,5 +68,7 @@ glFramebufferTexture2D  将纹理图像附加到帧缓冲对象，texture->fbo
 使用纹理坐标获取纹理颜色叫做采样(Sampling)
 纹理坐标起始于(0, 0)，也就是纹理图片的左下角，终始于(1, 1)，即纹理图片的右上角
 
+FBO
+
 
 
