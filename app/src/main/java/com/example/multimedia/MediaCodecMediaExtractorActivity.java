@@ -15,7 +15,7 @@ import android.view.View;
 
 public class MediaCodecMediaExtractorActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
-    private String filePath;
+    private String filePath = "/sdcard/DCIM/HEVC.mp4";
     private SurfaceView surfaceView;
     AVplayer avplayer;
     @Override
@@ -79,6 +79,7 @@ public class MediaCodecMediaExtractorActivity extends Activity {
                     if (cursor != null) {
                         if (cursor.moveToFirst()) {
                             filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
+                            filePath = "/sdcard/DCIM/HEVC.mp4";
                         }
                     }
                 }

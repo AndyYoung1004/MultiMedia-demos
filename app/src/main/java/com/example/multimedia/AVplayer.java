@@ -10,22 +10,42 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
+import com.google.android.exoplayer2.C;
+//import com.google.android.exoplayer2.audio.AudioProcessor;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class AVplayer {
     private static final String TAG = "AVplayer";
     final int TIMEOUT_USEC = 10000;   // 10 毫秒
     private boolean isPlaying = false;
     private Surface surface;
+    private SonicAudioProcessor audioProcessor;
 
     private VideoThread videoThread;
     private AudioThread audioThread;
     private String mediaPath;
+    private FileOutputStream inputFileStream, outputFileStream;
+    private static final AudioProcessor.AudioFormat AUDIO_FORMAT_44100_HZ =
+            new AudioProcessor.AudioFormat(
+                    /* sampleRate= */ 44100, /* channelCount= */ 2, /* encoding= */ C.ENCODING_PCM_16BIT);
+
 
     public AVplayer(String path, Surface surface) {
         this.mediaPath = path;
         this.surface = surface;
+        this.audioProcessor = new SonicAudioProcessor();
+        try {
+            inputFileStream = new FileOutputStream("/sdcard/DCIM/input.pcm");
+            outputFileStream = new FileOutputStream("/sdcard/DCIM/output.pcm");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void releasePlayer() {
@@ -172,17 +192,14 @@ public class AVplayer {
             }
             audioCodec.start();
             //
-            final ByteBuffer[] buffers = audioCodec.getOutputBuffers();
-            int sz = buffers[0].capacity();
-            if (sz <= 0)
-                sz = audioInputBufferSize;
-            byte[] mAudioOutTempBuf = new byte[sz];
-
             MediaCodec.BufferInfo audioBufferInfo = new MediaCodec.BufferInfo();
             ByteBuffer[] inputBuffers = audioCodec.getInputBuffers();
             ByteBuffer[] outputBuffers = audioCodec.getOutputBuffers();
             boolean isAudioEOS = false;
             long startMs = System.currentTimeMillis();
+            ByteBuffer sonicInputBuffer = ByteBuffer.allocateDirect(1_000_000).order(ByteOrder.nativeOrder());
+            ByteBuffer sonicOutputBuffer = ByteBuffer.allocateDirect(1_000_000).order(ByteOrder.nativeOrder());
+            configAudioProcessor();
 
             while (!Thread.interrupted()) {
                 if (!isPlaying) {
@@ -207,23 +224,43 @@ public class AVplayer {
                         ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
                         //延时操作
                         //如果缓冲区里的可展示时间>当前视频播放的进度，就休眠一下
-                        sleepRender(audioBufferInfo, startMs);
+//                        sleepRender(audioBufferInfo, startMs);
                         if (audioBufferInfo.size > 0) {
-                            if (mAudioOutTempBuf.length < audioBufferInfo.size) {
-                                mAudioOutTempBuf = new byte[audioBufferInfo.size];
+                            sonicInputBuffer.clear();
+                            sonicOutputBuffer.clear();
+                            while(outputBuffer.remaining() > 0) {
+                                sonicInputBuffer.put(outputBuffer.get());
                             }
-                            outputBuffer.position(0);
-                            outputBuffer.get(mAudioOutTempBuf, 0, audioBufferInfo.size);
-                            outputBuffer.clear();
-                            if (audioTrack != null)
-                                audioTrack.write(mAudioOutTempBuf, 0, audioBufferInfo.size);
+                            sonicInputBuffer.flip();
+                            try {
+                                inputFileStream.write(sonicInputBuffer.array(), sonicInputBuffer.position(), (sonicInputBuffer.limit() - sonicInputBuffer.position()));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            audioProcessor.queueInput(sonicInputBuffer);
+                            sonicOutputBuffer = audioProcessor.getOutput();
+                            try {
+                                outputFileStream.write(sonicOutputBuffer.array(), sonicOutputBuffer.position(), (sonicOutputBuffer.limit() - sonicOutputBuffer.position()));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (audioTrack != null) {
+//                                audioTrack.write(sonicOutputBuffer, sonicOutputBuffer.limit() - sonicOutputBuffer.position(), AudioTrack.WRITE_BLOCKING);
+                                audioTrack.write(sonicOutputBuffer, sonicOutputBuffer.limit() - sonicOutputBuffer.position(), AudioTrack.WRITE_BLOCKING);
+                            }
                         }
                         audioCodec.releaseOutputBuffer(outputBufferIndex, false);
                         break;
                 }
 
                 if ((audioBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.v(TAG, "buffer stream end");
+                    Log.d(TAG, "yangliu buffer stream end");
+                    try {
+                        inputFileStream.close();
+                        outputFileStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }//end while
@@ -245,6 +282,17 @@ public class AVplayer {
             audioThread = new AudioThread();
             audioThread.start();
         }
+    }
+
+    private void configAudioProcessor() {
+        audioProcessor.setOutputSampleRateHz(44100);
+        audioProcessor.setSpeed(1.5f);
+        try {
+            AudioProcessor.AudioFormat outputAudioFormat = audioProcessor.configure(AUDIO_FORMAT_44100_HZ);
+        } catch (AudioProcessor.UnhandledAudioFormatException e) {
+            e.printStackTrace();
+        }
+        audioProcessor.flush();
     }
 
     //获取指定类型媒体文件所在轨道
