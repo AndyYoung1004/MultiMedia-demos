@@ -1,4 +1,4 @@
 package com.example.multimedia.player;
 
-public class VideoDecoder {
+public class VideoDecoder extends DecoderBase {
 }
