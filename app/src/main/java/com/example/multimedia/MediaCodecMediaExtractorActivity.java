@@ -12,12 +12,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.example.multimedia.player.AVPlayer;
+
 
 public class MediaCodecMediaExtractorActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath = "/sdcard/DCIM/HEVC.mp4";
     private SurfaceView surfaceView;
-    AVplayer avplayer;
+    AVPlayer avplayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +60,7 @@ public class MediaCodecMediaExtractorActivity extends Activity {
     }
 
     private void startPlayer(String filepath) {
-        avplayer = new AVplayer(filepath, surfaceView.getHolder().getSurface());
+        avplayer = new AVPlayer(filepath, surfaceView.getHolder().getSurface());
         avplayer.playMediaFile();
     }
 

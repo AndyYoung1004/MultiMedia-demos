@@ -37,9 +37,4 @@ public class DecoderBase implements IDecoder {
         }
         codec.start();
     }
-
-    public boolean queueBufferToCodec() {
-
-        return true;
-    }
 }
