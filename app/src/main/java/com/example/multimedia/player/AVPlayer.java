@@ -13,7 +13,7 @@ import android.view.Surface;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class AVPlayer {
+public class AVPlayer implements IMediaPlayer {
     private static final String TAG = "AVPlayer";
     final int TIMEOUT_USEC = 10000;   // 10 毫秒
     private boolean isPlaying = false;
@@ -23,13 +23,41 @@ public class AVPlayer {
     private AudioThread audioThread;
     private String mediaPath;
 
-    public AVPlayer(String path, Surface surface) {
-        this.mediaPath = path;
+    public void releasePlayer() {
+        isPlaying = false;
+    }
+
+    @Override
+    public void setDataSource(String filePath) {
+        this.mediaPath = filePath;
+    }
+
+    @Override
+    public void setDisplay(Surface surface) {
         this.surface = surface;
     }
 
-    public void releasePlayer() {
-        isPlaying = false;
+    @Override
+    public void prepare() {
+
+    }
+
+    @Override
+    public void start() {
+        isPlaying = true;
+        if (videoThread == null) {
+            videoThread = new VideoThread();
+            videoThread.start();
+        }
+        if (audioThread == null) {
+            audioThread = new AudioThread();
+            audioThread.start();
+        }
+    }
+
+    @Override
+    public void stop() {
+
     }
 
     // 处理视频通道
@@ -232,18 +260,6 @@ public class AVPlayer {
             audioExtractor.release();
             audioTrack.stop();
             audioTrack.release();
-        }
-    }
-
-    public void playMediaFile() {
-        isPlaying = true;
-        if (videoThread == null) {
-            videoThread = new VideoThread();
-            videoThread.start();
-        }
-        if (audioThread == null) {
-            audioThread = new AudioThread();
-            audioThread.start();
         }
     }
 
