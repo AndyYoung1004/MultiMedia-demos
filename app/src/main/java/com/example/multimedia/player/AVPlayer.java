@@ -22,6 +22,9 @@ public class AVPlayer implements IMediaPlayer {
     private VideoThread videoThread;
     private AudioThread audioThread;
     private String mediaPath;
+    MediaExtractor videoExtractor, audioExtractor;
+    MediaCodec videoCodec, audioCodec;
+    AudioTrack audioTrack;
 
     public void releasePlayer() {
         isPlaying = false;
@@ -39,7 +42,67 @@ public class AVPlayer implements IMediaPlayer {
 
     @Override
     public void prepare() {
-
+        {
+            videoExtractor = new MediaExtractor();
+            try {
+                videoExtractor.setDataSource(mediaPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // 获得视频所在的 轨道
+            int trackIndex = getMediaTrackIndex(videoExtractor, "video/");
+            if (trackIndex >=0) {
+                MediaFormat format = videoExtractor.getTrackFormat(trackIndex);
+                // 指定解码后的帧格式
+                format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+                String mimeType = format.getString(MediaFormat.KEY_MIME);
+                videoExtractor.selectTrack(trackIndex);
+                try {
+                    videoCodec = MediaCodec.createDecoderByType(mimeType);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                videoCodec.configure(format, surface, null, 0);
+            }
+        }
+        {
+            audioExtractor = new MediaExtractor();
+            try {
+                audioExtractor.setDataSource(mediaPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < audioExtractor.getTrackCount(); i++) {
+                MediaFormat mediaFormat = audioExtractor.getTrackFormat(i);
+                String mime = mediaFormat.getString(MediaFormat.KEY_MIME);
+                if (mime.startsWith("audio/")) {
+                    audioExtractor.selectTrack(i);
+                    int audioChannels = mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+                    int audioSampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+                    int minBufferSize = AudioTrack.getMinBufferSize(audioSampleRate,
+                            (audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+                            AudioFormat.ENCODING_PCM_16BIT);
+                    int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
+                    int audioInputBufferSize = minBufferSize > 0 ? minBufferSize * 4 : maxInputSize;
+                    int frameSizeInBytes = audioChannels * 2;
+                    audioInputBufferSize = (audioInputBufferSize / frameSizeInBytes) * frameSizeInBytes;
+                    audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                            audioSampleRate,
+                            (audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+                            AudioFormat.ENCODING_PCM_16BIT,
+                            audioInputBufferSize,
+                            AudioTrack.MODE_STREAM);
+                    audioTrack.play();
+                    try {
+                        audioCodec = MediaCodec.createDecoderByType(mime);
+                        audioCodec.configure(mediaFormat, null, null, 0);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -67,50 +130,20 @@ public class AVPlayer implements IMediaPlayer {
 
         @Override
         public void run() {
-            try {
-                MediaExtractor videoExtractor = new MediaExtractor();
-                MediaCodec mediaCodec = null;
-                videoExtractor.setDataSource(mediaPath);
-                // 获得视频所在的 轨道
-                int trackIndex = getMediaTrackIndex(videoExtractor, "video/");
-                if (trackIndex >=0) {
-                    MediaFormat format = videoExtractor.getTrackFormat(trackIndex);
-                    // 指定解码后的帧格式
-                    format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
-
-                    String mimeType = format.getString(MediaFormat.KEY_MIME);
-
-                    // 切换到视频信道
-                    videoExtractor.selectTrack(trackIndex);
-                    // 创将解码视频的MediaCodec，解码器
-                    mediaCodec = MediaCodec.createDecoderByType(mimeType);
-                    // 配置绑定 surface
-                    mediaCodec.configure(format, surface, null, 0);
-                }
-
-                if (mediaCodec == null) {
-                    Log.v(TAG, "MediaCodec null");
-                    return;
-                }
-                mediaCodec.start();
-
-                // 开始循环，一直到视频资源结束
+                videoCodec.start();
                 MediaCodec.BufferInfo videoBufferInfo = new MediaCodec.BufferInfo();
-                ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();  // 用来存放媒体文件的数据
-                long startMs = System.currentTimeMillis();  // 开始的时间
-                // 当前Thread 没有被中断
+                ByteBuffer[] inputBuffers = videoCodec.getInputBuffers();
+                long startMs = System.currentTimeMillis();
                 while (!Thread.interrupted()) {
                     if (!isPlaying) {
                         return;
                     }
 
                     if (!isVideoOver) {
-                        // 视频没有结束  提取一个单位的视频资源放到 解码器(mediaCodec) 缓冲区中
-                        isVideoOver = putBufferToMediaCodec(videoExtractor, mediaCodec, inputBuffers);
+                        isVideoOver = putBufferToMediaCodec(videoExtractor, videoCodec, inputBuffers);
                     }
 
-                    // 返回一个被成功解码的buffer的 index 或者是一个信息  同时更新 videoBufferInfo 的数据
-                    int outputBufferIndex = mediaCodec.dequeueOutputBuffer(videoBufferInfo, TIMEOUT_USEC);
+                    int outputBufferIndex = videoCodec.dequeueOutputBuffer(videoBufferInfo, TIMEOUT_USEC);
                     switch (outputBufferIndex) {
                         case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                             Log.v(TAG, "format changed");
@@ -123,12 +156,9 @@ public class AVPlayer implements IMediaPlayer {
                             Log.v(TAG, "output buffers changed");
                             break;
                         default:
-                            //延时操作
-                            //如果缓冲区里的可展示时间>当前视频播放的总时间，就休眠一下 展示当前的帧，
                             sleepRender(videoBufferInfo, startMs);
 
-                            //渲染为true就会渲染到surface   configure() 设置的surface
-                            mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
+                            videoCodec.releaseOutputBuffer(outputBufferIndex, true);
                             break;
                     }
 
@@ -138,72 +168,21 @@ public class AVPlayer implements IMediaPlayer {
                     }
                 }
 
-                mediaCodec.stop();
-                mediaCodec.release();
+                videoCodec.stop();
+                videoCodec.release();
                 videoExtractor.release();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     // 处理音频通道
     private class AudioThread extends Thread {
 
-        private int audioInputBufferSize;
-        private AudioTrack audioTrack;
-
         @Override
         public void run() {
-            MediaExtractor audioExtractor = new MediaExtractor();
-            MediaCodec audioCodec = null;
-            try {
-                audioExtractor.setDataSource(mediaPath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            for (int i = 0; i < audioExtractor.getTrackCount(); i++) {
-                MediaFormat mediaFormat = audioExtractor.getTrackFormat(i);
-                String mime = mediaFormat.getString(MediaFormat.KEY_MIME);
-                if (mime.startsWith("audio/")) {
-                    audioExtractor.selectTrack(i);
-                    int audioChannels = mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-                    int audioSampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
-                    int minBufferSize = AudioTrack.getMinBufferSize(audioSampleRate,
-                            (audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
-                            AudioFormat.ENCODING_PCM_16BIT);
-                    int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
-                    audioInputBufferSize = minBufferSize > 0 ? minBufferSize * 4 : maxInputSize;
-                    int frameSizeInBytes = audioChannels * 2;
-                    audioInputBufferSize = (audioInputBufferSize / frameSizeInBytes) * frameSizeInBytes;
-                    audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                            audioSampleRate,
-                            (audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
-                            AudioFormat.ENCODING_PCM_16BIT,
-                            audioInputBufferSize,
-                            AudioTrack.MODE_STREAM);
-                    audioTrack.play();
-                    Log.v(TAG, "audio play");
-                    //
-                    try {
-                        audioCodec = MediaCodec.createDecoderByType(mime);
-                        audioCodec.configure(mediaFormat, null, null, 0);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-            }
-            if (audioCodec == null) {
-                Log.v(TAG, "audio decoder null");
-                return;
-            }
             audioCodec.start();
             //
             final ByteBuffer[] buffers = audioCodec.getOutputBuffers();
             int sz = buffers[0].capacity();
-            if (sz <= 0)
-                sz = audioInputBufferSize;
             byte[] mAudioOutTempBuf = new byte[sz];
 
             MediaCodec.BufferInfo audioBufferInfo = new MediaCodec.BufferInfo();
@@ -263,7 +242,6 @@ public class AVPlayer implements IMediaPlayer {
         }
     }
 
-    //获取指定类型媒体文件所在轨道
     private int getMediaTrackIndex(MediaExtractor videoExtractor, String MEDIA_TYPE) {
         int trackIndex = -1;
         // 获得轨道数量
@@ -279,24 +257,17 @@ public class AVPlayer implements IMediaPlayer {
         return trackIndex;
     }
 
-    /**
-     * 将缓冲区传递至解码器
-     * 如果到了文件末尾，返回true;否则返回false
-     */
     private boolean putBufferToMediaCodec(MediaExtractor extractor, MediaCodec decoder, ByteBuffer[] inputBuffers) {
         boolean isMediaEOS = false;
-        // 解码器  要填充有效数据的输入缓冲区的索引 —————— 此id的缓冲区可以被使用
         int inputBufferIndex = decoder.dequeueInputBuffer(TIMEOUT_USEC);
         if (inputBufferIndex >= 0) {
             ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
-            // MediaExtractor读取媒体文件的数据，存储到缓冲区中。并返回大小。结束为-1
             int sampleSize = extractor.readSampleData(inputBuffer, 0);
             if (sampleSize < 0) {
                 decoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 isMediaEOS = true;
                 Log.v(TAG, "media eos");
             } else {
-                // 在输入缓冲区添加数据之后，把它告诉 MediaCodec （解码）
                 decoder.queueInputBuffer(inputBufferIndex, 0, sampleSize, extractor.getSampleTime(), 0);
                 // MediaExtractor 准备下一个 单位的数据
                 boolean ad = extractor.advance();
@@ -304,15 +275,11 @@ public class AVPlayer implements IMediaPlayer {
                     isMediaEOS = false;
                 }
             }
-        } else {
-            // 缓冲区不可用
         }
         return isMediaEOS;
     }
 
     private void sleepRender(MediaCodec.BufferInfo audioBufferInfo, long startMs) {
-        // 这里的时间是 毫秒  presentationTimeUs 的时间是累加的 以微秒进行一帧一帧的累加
-        // audioBufferInfo 是改变的
         while (audioBufferInfo.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
             try {
                 // 10 毫秒
