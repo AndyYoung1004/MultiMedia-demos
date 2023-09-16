@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MediaPlayerActivity"/>
-        <activity android:name=".MediaCodecMediaExtractorActivity"/>
+        <activity android:name=".AVPlayerActivity"/>
         <activity android:name=".ExoplayerActivity"/>
         <activity android:name=".GLSurfaceViewActivity"/>
         <activity android:name=".GLPictureActivity"/>

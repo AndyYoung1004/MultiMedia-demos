@@ -55,7 +55,7 @@ public class MainActivity extends ListActivity {
             startActivity(intent);
         } else if (position == MEDIA_CODEC_ACTIVITY) {
             Intent intent = new Intent();
-            intent.setClass(MainActivity.this, MediaCodecMediaExtractorActivity.class);
+            intent.setClass(MainActivity.this, AVPlayerActivity.class);
             startActivity(intent);
         } else if (position == EXO_PLAYER_ACTIVITY) {
             Intent intent = new Intent();
