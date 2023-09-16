@@ -36,12 +36,7 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
         track.play();
     }
 
-    public void renderFrame() {
-        queueBufferToCodec();
-        outputData();
-    }
-
-    private void outputData() {
+    public void outputData() {
         int outputBufferIndex = codec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
         switch (outputBufferIndex) {
             case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
