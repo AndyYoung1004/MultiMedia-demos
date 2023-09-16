@@ -23,9 +23,9 @@ public class AVPlayer implements IMediaPlayer {
     public void prepare() {
         audioRenderer = new MediaCodecAudioRenderer(filePath);
         videoRenderer = new MediaCodecVideoRenderer(filePath, surface);
-        audioRenderer.initCodecAndExtractor();
+        audioRenderer.initMediaCodecRenderer();
         audioRenderer.initAudioTrack();
-        videoRenderer.initCodecAndExtractor();
+        videoRenderer.initMediaCodecRenderer();
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.example.multimedia.player;
 
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
-import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.view.Surface;
 
@@ -11,21 +10,17 @@ import java.nio.ByteBuffer;
 
 public class MediaCodecRenderer {
     private static final int TIMEOUT_USEC = 10000;
-    private MediaExtractor extractor;
+    private IExtractor extractor;
     public MediaCodec codec;
-    private String filePath;
-    private long timeStamp;
     public MediaFormat format;
+    private long timeStamp;
     public MediaCodec.BufferInfo bufferInfo;
-    private String mime;
     private Surface surface;
 
     MediaCodecRenderer(String filePath, String mime, Surface surface) {
-        this.filePath = filePath;
-        this.mime = mime;
         this.surface = surface;
         this.bufferInfo = new MediaCodec.BufferInfo();
-        this.extractor = new MediaExtractor();
+        this.extractor = new AVExtractor(filePath, mime);
     }
 
     public void start() {
@@ -36,26 +31,20 @@ public class MediaCodecRenderer {
         return timeStamp;
     }
 
-    public void initCodecAndExtractor() {
+    public void initMediaCodecRenderer() {
+        format = extractor.init();
+        initCodec();
+    }
+
+    private void initCodec() {
+        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+        String mimeType = format.getString(MediaFormat.KEY_MIME);
         try {
-            extractor.setDataSource(filePath);
+            codec = MediaCodec.createDecoderByType(mimeType);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        int trackIndex = getMediaTrackIndex(extractor, mime);
-        if (trackIndex >= 0) {
-            format = extractor.getTrackFormat(trackIndex);
-            // 指定解码后的帧格式
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
-            String mimeType = format.getString(MediaFormat.KEY_MIME);
-            extractor.selectTrack(trackIndex);
-            try {
-                codec = MediaCodec.createDecoderByType(mimeType);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            codec.configure(format, surface, null, 0);
-        }
+        codec.configure(format, surface, null, 0);
     }
 
     public void renderFrame() {
@@ -63,12 +52,12 @@ public class MediaCodecRenderer {
         outputData();
     }
 
-    public boolean queueBufferToCodec() {
+    private boolean queueBufferToCodec() {
         boolean isEos = false;
         int inputBufferIndex = codec.dequeueInputBuffer(TIMEOUT_USEC);
         if (inputBufferIndex >= 0) {
             ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferIndex);
-            int sampleSize = extractor.readSampleData(inputBuffer, 0);
+            int sampleSize = extractor.readSampleData(inputBuffer);
             if (sampleSize < 0) {
                 codec.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                 isEos = true;
@@ -94,20 +83,5 @@ public class MediaCodecRenderer {
                 codec.releaseOutputBuffer(outputBufferIndex, true);
                 break;
         }
-    }
-
-    private int getMediaTrackIndex(MediaExtractor videoExtractor, String MEDIA_TYPE) {
-        int trackIndex = -1;
-        // 获得轨道数量
-        int trackNum = videoExtractor.getTrackCount();
-        for (int i = 0; i < trackNum; i++) {
-            MediaFormat mediaFormat = videoExtractor.getTrackFormat(i);
-            String mime = mediaFormat.getString(MediaFormat.KEY_MIME);
-            if (mime.startsWith(MEDIA_TYPE)) {
-                trackIndex = i;
-                break;
-            }
-        }
-        return trackIndex;
     }
 }
