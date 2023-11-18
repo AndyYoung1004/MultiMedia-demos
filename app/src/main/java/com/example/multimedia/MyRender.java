@@ -44,4 +44,3 @@ public class MyRender implements BaseEGLSurface.Renderer {
         mModel.setCallback(callback);
     }
 }
-

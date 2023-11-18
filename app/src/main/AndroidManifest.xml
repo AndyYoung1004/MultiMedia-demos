@@ -25,6 +25,8 @@
         <activity android:name=".ExoplayerActivity"/>
         <activity android:name=".GLSurfaceViewActivity"/>
         <activity android:name=".GLPictureActivity"/>
+        <activity android:name=".GLPicActivity"/>
+        <activity android:name=".GLMultiTextureActivity"/>
         <activity android:name=".GLCameraPictureActivity"/>
         <activity android:name=".FBOActivity"/>
         <activity android:name=".NDKPlayerActivity"/>

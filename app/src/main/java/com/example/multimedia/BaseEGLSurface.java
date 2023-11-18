@@ -144,7 +144,7 @@ public class BaseEGLSurface {
     private int[] mEGLContextAttrs = {EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE};
 
     // EGL状态
-    enum EglStatus {
+    public enum EglStatus {
         INVALID, INITIALIZED, CREATED, DRAW
     }
 
