@@ -28,6 +28,7 @@
         <activity android:name=".GLCameraPictureActivity"/>
         <activity android:name=".FBOActivity"/>
         <activity android:name=".NDKPlayerActivity"/>
+        <activity android:name=".WatermarkViewActivity"/>
     </application>
 
 </manifest>

@@ -8,12 +8,12 @@ import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.View;
 
 public class GLSurfaceViewActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath = "/sdcard/DCIM/HEVC.mp4";
     private GLSurfaceView glView;
+    private GLSurfaceViewRenderer renderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +21,8 @@ public class GLSurfaceViewActivity extends Activity {
         setContentView(R.layout.activity_glsurfaceview);
         glView = findViewById(R.id.glSfView);
         glView.setEGLContextClientVersion(2);
-        GLSurfaceViewRenderer glVideoRenderer = new GLSurfaceViewRenderer(getApplicationContext(), filePath);//创建renderer
-        glView.setRenderer(glVideoRenderer);//设置renderer
+        renderer = new GLSurfaceViewRenderer(getApplicationContext(), filePath);//创建renderer
+        glView.setRenderer(renderer);//设置renderer
     }
 
     @Override

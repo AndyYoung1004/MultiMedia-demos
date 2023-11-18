@@ -27,6 +27,7 @@ public class MainActivity extends ListActivity {
     private final int GL_CAMERA_PICTURE_ACTIVITY = 6;
     private final int GL_FBO_ACTIVITY = 7;
     private final int GL_NDK_PLAYER_ACTIVITY = 8;
+    private final int WATER_MARK_VIEW = 9;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +41,7 @@ public class MainActivity extends ListActivity {
         displayList.add("相机预览拍摄图片");
         displayList.add("照片FBO");
         displayList.add("NDK播放器");
+        displayList.add("自定义View");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, displayList);
         setListAdapter(adapter);
@@ -84,6 +86,10 @@ public class MainActivity extends ListActivity {
         } else if (position == GL_NDK_PLAYER_ACTIVITY) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, NDKPlayerActivity.class);
+            startActivity(intent);
+        } else if (position == WATER_MARK_VIEW) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, WatermarkViewActivity.class);
             startActivity(intent);
         }
     }
