@@ -14,6 +14,7 @@ public class GLSurfaceViewActivity extends Activity {
     private String filePath = "/sdcard/DCIM/HEVC.mp4";
     private GLSurfaceView glView;
     private GLSurfaceViewRenderer renderer;
+    private GLSimpleRenderer renderer1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +22,10 @@ public class GLSurfaceViewActivity extends Activity {
         setContentView(R.layout.activity_glsurfaceview);
         glView = findViewById(R.id.glSfView);
         glView.setEGLContextClientVersion(2);
-        renderer = new GLSurfaceViewRenderer(getApplicationContext(), filePath);//创建renderer
-        glView.setRenderer(renderer);//设置renderer
+//        renderer = new GLSurfaceViewRenderer(getApplicationContext(), filePath);//创建renderer
+//        glView.setRenderer(renderer);//设置renderer
+        renderer1 = new GLSimpleRenderer(getApplicationContext(), filePath);
+        glView.setRenderer(renderer1);
     }
 
     @Override
