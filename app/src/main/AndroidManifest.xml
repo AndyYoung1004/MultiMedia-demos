@@ -31,6 +31,7 @@
         <activity android:name=".FBOActivity"/>
         <activity android:name=".NDKPlayerActivity"/>
         <activity android:name=".WatermarkViewActivity"/>
+        <activity android:name=".GLPICROTATEActivity"/>
     </application>
 
 </manifest>
