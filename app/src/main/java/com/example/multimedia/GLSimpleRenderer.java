@@ -19,10 +19,9 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class GLSimpleRenderer implements GLSurfaceView.Renderer {
+public class GLSimpleRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
     private static final String TAG = "GLSimpleRenderer";
     private Context context;
-
     private int programId;
     private int aPositionLocation;
     private int uTextureSamplerLocation;
@@ -43,12 +42,13 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer {
             1f, 1f,
             0f, 1f
     };
-
     private SurfaceTexture surfaceTexture;
     private MediaPlayer mediaPlayer;
-
     private String videoPath;
     private int screenWidth, screenHeight;
+    private float[] mSTMatrix = new float[16];
+    private int uSTMMatrixHandle;
+    private boolean updateSurface;
 
     public GLSimpleRenderer(Context context, String videoPath) {
         this.context = context;
@@ -74,9 +74,9 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer {
         String fragmentShader = ShaderUtils.readRawTextFile(context, R.raw.video_fragment_sharder);
         programId = ShaderUtils.createProgram(vertexShader, fragmentShader);
         aPositionLocation = GLES20.glGetAttribLocation(programId, "aPosition");//顶点坐标handle
-
         uTextureSamplerLocation = GLES20.glGetUniformLocation(programId, "sTexture");
         aTextureCoordLocation = GLES20.glGetAttribLocation(programId, "aTexCoord");//纹理坐标handle
+        uSTMMatrixHandle = GLES20.glGetUniformLocation(programId, "uSTMatrix");//纹理矩阵handle
 
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
@@ -91,7 +91,7 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer {
                 GLES20.GL_LINEAR);
 
         surfaceTexture = new SurfaceTexture(textureId);
-
+        surfaceTexture.setOnFrameAvailableListener(this);
         Surface surface = new Surface(surfaceTexture);
         mediaPlayer.setSurface(surface);
     }
@@ -121,9 +121,14 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-        surfaceTexture.updateTexImage();//获取新数据
+        if (updateSurface) {
+            updateSurface = false;
+            surfaceTexture.updateTexImage();//获取新数据
+            surfaceTexture.getTransformMatrix(mSTMatrix);//让新的纹理和纹理坐标系能够正确的对应,mSTMatrix的定义是和projectionMatrix完全一样的。
+        }
         GLES20.glUseProgram(programId);
 
+        GLES20.glUniformMatrix4fv(uSTMMatrixHandle, 1, false, mSTMatrix, 0);
         vertexBuffer.position(0);
         GLES20.glEnableVertexAttribArray(aPositionLocation);
         GLES20.glVertexAttribPointer(aPositionLocation, 3, GLES20.GL_FLOAT, false,
@@ -138,5 +143,10 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer {
         //
         GLES20.glViewport(0, 0, screenWidth, screenHeight);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        updateSurface = true;
     }
 }
