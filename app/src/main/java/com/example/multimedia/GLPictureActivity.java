@@ -92,7 +92,7 @@ public class GLPictureActivity extends Activity {
         }
 
         @Override
-        public void onDrawFrame(GL10 gl) { // 绘制
+        public void onDrawFrame(GL10 gl) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
             // 根据纹理id，顶点和纹理坐标数据绘制图片
             mGLImageHandler.onDraw(mGLCubeBuffer, mGLTextureBuffer);

@@ -48,12 +48,7 @@ public class GLPicActivity extends Activity {
             -1.0f, 1.0f,  // v3
             1.0f, 1.0f,   // v4
     };
-    static final float CUBE2[] = { // 窗口中心为OpenGL二维坐标系的原点（0,0）
-            -1.0f, 0.5f, // v1
-            0f, 0.5f,  // v2
-            -1.0f, 1.0f,  // v3
-            0f, 1.0f,   // v4
-    };
+
     // 纹理也有坐标系，称UV坐标，或者ST坐标。UV坐标定义为左上角（0，0），右下角（1，1），一张图片无论大小为多少，在UV坐标系中都是图片左上角为（0，0），右下角（1，1）
     // 纹理坐标，每个坐标的纹理采样对应上面顶点坐标。
     public static final float TEXTURE_NO_ROTATION[] = {
@@ -64,7 +59,7 @@ public class GLPicActivity extends Activity {
     };
 
     private GLSurfaceView mGLSurfaceView;
-    private FloatBuffer mGLCubeBuffer, mGLCubeBuffer2, mGLTextureBuffer;
+    private FloatBuffer mGLCubeBuffer, mGLTextureBuffer;
     private int mGLProgramId;
     private int mPosHandle;
     private int mTextureId, mTextureId2;
@@ -93,13 +88,10 @@ public class GLPicActivity extends Activity {
             mTextureCoordHandle = GLES20.glGetAttribLocation(mGLProgramId, "inputTextureCoordinate");
             // 需要显示的图片
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.thelittleprince);
-            Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.dog);
-
             int textures[] = new int[] {-1, -1};
             GLES20.glGenTextures(2, textures, 0);
 
             mTextureId = textures[0];
-            mTextureId2 = textures[1];
 
             GLES20.glActiveTexture(GLES20.GL_TEXTURE);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
@@ -110,24 +102,11 @@ public class GLPicActivity extends Activity {
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, GLES20.GL_NONE);
 
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId2);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT); // S轴的拉伸方式为重复，决定采样值的坐标超出图片范围时的采样方式
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT); // T轴的拉伸方式为重复
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap2, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, GLES20.GL_NONE);
-
             // 顶点数组缓冲器
             mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer();
             mGLCubeBuffer.put(CUBE).position(0);
-
-            mGLCubeBuffer2 = ByteBuffer.allocateDirect(CUBE2.length * 4)
-                    .order(ByteOrder.nativeOrder())
-                    .asFloatBuffer();
-            mGLCubeBuffer2.put(CUBE2).position(0);
 
             // 纹理数组缓冲器
             mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
@@ -142,12 +121,11 @@ public class GLPicActivity extends Activity {
         }
 
         @Override
-        public void onDrawFrame(GL10 gl) { // 绘制
+        public void onDrawFrame(GL10 gl) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
             // 根据纹理id，顶点和纹理坐标数据绘制图片
             GLES20.glUseProgram(mGLProgramId);
             drawBackGround();
-            drawWatermark();
         }
 
         void drawBackGround() {
@@ -157,21 +135,6 @@ public class GLPicActivity extends Activity {
             GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
             mGLCubeBuffer.position(0);
             GLES20.glVertexAttribPointer(mPosHandle, 2, GLES20.GL_FLOAT, false, 0, mGLCubeBuffer);
-            mGLTextureBuffer.position(0);
-            GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 0, mGLTextureBuffer);
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, GLES20.GL_NONE);
-            GLES20.glDisableVertexAttribArray(mPosHandle);
-            GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
-        }
-
-        void drawWatermark() {
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId2);
-            GLES20.glEnableVertexAttribArray(mPosHandle);
-            GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
-            mGLCubeBuffer2.position(0);
-            GLES20.glVertexAttribPointer(mPosHandle, 2, GLES20.GL_FLOAT, false, 0, mGLCubeBuffer2);
             mGLTextureBuffer.position(0);
             GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 0, mGLTextureBuffer);
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
