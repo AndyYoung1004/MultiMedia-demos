@@ -73,7 +73,10 @@ public class FBOActivity extends Activity {
             //启动深度测试
             GLES30.glEnable(GLES30.GL_DEPTH_TEST);
             //创建程序id
-            mProgramId = ShaderUtils2.createProgram(mResources, R.raw.pic_vertex_shader, R.raw.pic_fragment_shader);
+            String vertexShader = ShaderUtils.readRawTextFile(getApplicationContext(), R.raw.pic_vertex_shader);
+            String fragmentShader = ShaderUtils.readRawTextFile(getApplicationContext(), R.raw.pic_fragment_shader);
+            mProgramId = ShaderUtils.createProgram(vertexShader, fragmentShader);
+
             TextureUtils.loadTexture(mResources, R.drawable.thelittleprince, mBitmapSize, mTextureId, mFrameBufferId);
         }
 
