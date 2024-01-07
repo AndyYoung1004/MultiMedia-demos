@@ -11,6 +11,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
 
+import com.example.multimedia.utils.ShaderUtils;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

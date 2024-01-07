@@ -1,10 +1,9 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.Manifest;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;

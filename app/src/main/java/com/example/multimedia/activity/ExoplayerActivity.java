@@ -1,10 +1,9 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,30 +11,43 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.example.multimedia.R;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
-import java.io.IOException;
 
-public class MediaPlayerActivity extends Activity {
+public class ExoplayerActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath;
     private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
+    private SimpleExoPlayer player;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mediaplayer);
+        setContentView(R.layout.activity_exoplayer);
         surfaceView = findViewById(R.id.sfView);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {}
-
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
-
+            public void surfaceCreated(SurfaceHolder holder) {
+                surfaceHolder = holder;
+            }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {}
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+
+            }
         });
         findViewById(R.id.selectvideo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,21 +59,27 @@ public class MediaPlayerActivity extends Activity {
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startPlayer(filePath);
+                startPlayer();
             }
         });
     }
 
-    private void startPlayer(String filepath) {
-        MediaPlayer mp = new MediaPlayer();
-        try {
-            mp.setDataSource(filepath);
-            mp.setDisplay(surfaceView.getHolder());
-            mp.prepare();
-            mp.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void startPlayer() {
+        player = ExoPlayerFactory.newSimpleInstance(
+                getApplicationContext(),
+                new DefaultRenderersFactory(this),
+                new DefaultTrackSelector(),
+                new DefaultLoadControl()
+        );
+        player.setVideoSurfaceHolder(surfaceHolder);
+        player.prepare(buildMediaSource(Uri.parse(filePath)), true, false);
+        player.setPlayWhenReady(true);
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, "AndyYoung");
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+        return videoSource;
     }
 
     @Override
@@ -84,5 +102,14 @@ public class MediaPlayerActivity extends Activity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.stop();
+            player.release();
+        }
     }
 }

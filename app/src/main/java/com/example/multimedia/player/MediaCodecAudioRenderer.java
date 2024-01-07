@@ -59,4 +59,9 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
                 break;
         }
     }
+
+    public void stop() {
+        super.stop();
+        track.stop();
+    }
 }

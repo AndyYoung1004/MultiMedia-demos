@@ -1,4 +1,4 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -8,6 +8,10 @@ import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import com.example.multimedia.GLSimpleRenderer;
+import com.example.multimedia.GLSurfaceViewRenderer;
+import com.example.multimedia.R;
 
 public class GLSurfaceViewActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
@@ -47,5 +51,11 @@ public class GLSurfaceViewActivity extends Activity {
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        renderer1.release();
     }
 }

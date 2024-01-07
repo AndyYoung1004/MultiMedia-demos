@@ -1,4 +1,4 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
+
+import com.example.multimedia.R;
 
 public class NDKPlayerActivity extends Activity implements SurfaceHolder.Callback {
     private SurfaceView surfaceView;

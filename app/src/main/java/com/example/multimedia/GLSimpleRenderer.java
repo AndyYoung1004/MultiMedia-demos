@@ -2,14 +2,14 @@ package com.example.multimedia;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
+
+import com.example.multimedia.utils.ShaderUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -148,5 +148,12 @@ public class GLSimpleRenderer implements GLSurfaceView.Renderer, SurfaceTexture.
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         updateSurface = true;
+    }
+
+    public void release() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 }

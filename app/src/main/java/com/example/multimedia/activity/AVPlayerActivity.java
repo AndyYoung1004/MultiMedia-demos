@@ -1,11 +1,13 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.example.multimedia.R;
 import com.example.multimedia.player.AVPlayer;
 import com.example.multimedia.player.IMediaPlayer;
 
@@ -44,6 +46,12 @@ public class AVPlayerActivity extends Activity {
         avplayer.setDisplay(surfaceView.getHolder().getSurface());
         avplayer.prepare();
         avplayer.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        avplayer.stop();
     }
 
     @Override

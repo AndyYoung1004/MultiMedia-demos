@@ -1,4 +1,4 @@
-package com.example.multimedia;
+package com.example.multimedia.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

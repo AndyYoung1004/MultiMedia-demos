@@ -13,25 +13,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MultiMedia">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MediaPlayerActivity"/>
-        <activity android:name=".AVPlayerActivity"/>
-        <activity android:name=".ExoplayerActivity"/>
-        <activity android:name=".GLSurfaceViewActivity"/>
-        <activity android:name=".GLPictureActivity"/>
-        <activity android:name=".GLPicActivity"/>
-        <activity android:name=".GLMultiTextureActivity"/>
-        <activity android:name=".GLCameraPictureActivity"/>
-        <activity android:name=".FBOActivity"/>
-        <activity android:name=".NDKPlayerActivity"/>
-        <activity android:name=".WatermarkViewActivity"/>
-        <activity android:name=".GLPICROTATEActivity"/>
+        <activity android:name=".activity.MediaPlayerActivity"/>
+        <activity android:name=".activity.AVPlayerActivity"/>
+        <activity android:name=".activity.ExoplayerActivity"/>
+        <activity android:name=".activity.GLSurfaceViewActivity"/>
+        <activity android:name=".activity.GLPictureActivity"/>
+        <activity android:name=".activity.GLPicActivity"/>
+        <activity android:name=".activity.GLMultiTextureActivity"/>
+        <activity android:name=".activity.GLCameraPictureActivity"/>
+        <activity android:name=".activity.FBOActivity"/>
+        <activity android:name=".activity.NDKPlayerActivity"/>
+        <activity android:name=".activity.WatermarkViewActivity"/>
+        <activity android:name=".activity.GLPICROTATEActivity"/>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.multimedia.player;
 
+import android.util.Log;
 import android.view.Surface;
 
 public class AVPlayer implements IMediaPlayer {
@@ -8,6 +9,8 @@ public class AVPlayer implements IMediaPlayer {
     private MediaCodecVideoRenderer videoRenderer;
     private String filePath;
     private Surface surface;
+    private boolean playerStarted;
+    private boolean isAudioOver, isVideoOver;
 
     @Override
     public void setDataSource(String filePath) {
@@ -32,20 +35,26 @@ public class AVPlayer implements IMediaPlayer {
     public void start() {
         audioRenderer.start();
         videoRenderer.start();
+        playerStarted = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                isAudioOver = false;
+                while (playerStarted) {
                     audioRenderer.renderFrame();
                 }
+                isAudioOver = true;
             }
         }).start();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                isVideoOver = false;
+                while (playerStarted) {
                     if (videoRenderer.getTimeStamp() < audioRenderer.getTimeStamp()) {
                         videoRenderer.renderFrame();
+                    } else if (!playerStarted) {
+                        break;
                     } else {
                         try {
                             Thread.sleep(10);
@@ -54,12 +63,26 @@ public class AVPlayer implements IMediaPlayer {
                         }
                     }
                 }
+                isVideoOver = true;
             }
         }).start();
     }
 
     @Override
     public void stop() {
-
+        playerStarted = false;
+        while (true) {
+            if (isVideoOver & isAudioOver) {
+                break;
+            } else {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        audioRenderer.stop();
+        videoRenderer.stop();
     }
 }

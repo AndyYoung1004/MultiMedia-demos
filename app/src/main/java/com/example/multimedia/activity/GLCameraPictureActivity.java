@@ -1,8 +1,11 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+
+import com.example.multimedia.CameraTextureView;
+import com.example.multimedia.R;
 
 public class GLCameraPictureActivity extends Activity {
 

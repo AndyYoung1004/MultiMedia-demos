@@ -1,4 +1,4 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -9,6 +9,9 @@ import android.opengl.GLUtils;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+
+import com.example.multimedia.utils.OpenGlUtils;
+import com.example.multimedia.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

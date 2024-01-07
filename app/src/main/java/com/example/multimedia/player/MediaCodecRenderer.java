@@ -27,6 +27,11 @@ public class MediaCodecRenderer {
         codec.start();
     }
 
+    public void stop() {
+        codec.stop();
+        codec.release();
+    }
+
     public long getTimeStamp() {
         return timeStamp;
     }

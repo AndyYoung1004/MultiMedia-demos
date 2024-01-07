@@ -1,9 +1,10 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,42 +12,33 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
+import com.example.multimedia.R;
 
-public class ExoplayerActivity extends Activity {
+import java.io.IOException;
+
+public class MediaPlayerActivity extends Activity {
     private static final int REQUEST_CODE_PICK_VIDEO = 2;
     private String filePath;
     private SurfaceView surfaceView;
-    private SurfaceHolder surfaceHolder;
-    private SimpleExoPlayer player;
+    private MediaPlayer mp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exoplayer);
+        setContentView(R.layout.activity_mediaplayer);
         surfaceView = findViewById(R.id.sfView);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                surfaceHolder = holder;
-            }
+            public void surfaceCreated(SurfaceHolder holder) {}
+
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
-            }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
+            public void surfaceDestroyed(SurfaceHolder holder) {}
 
-            }
         });
         findViewById(R.id.selectvideo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,27 +50,27 @@ public class ExoplayerActivity extends Activity {
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startPlayer();
+                startPlayer(filePath);
             }
         });
     }
 
-    private void startPlayer() {
-        player = ExoPlayerFactory.newSimpleInstance(
-                getApplicationContext(),
-                new DefaultRenderersFactory(this),
-                new DefaultTrackSelector(),
-                new DefaultLoadControl()
-        );
-        player.setVideoSurfaceHolder(surfaceHolder);
-        player.prepare(buildMediaSource(Uri.parse(filePath)), true, false);
-        player.setPlayWhenReady(true);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mp.release();
     }
 
-    private MediaSource buildMediaSource(Uri uri) {
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, "AndyYoung");
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-        return videoSource;
+    private void startPlayer(String filepath) {
+        mp = new MediaPlayer();
+        try {
+            mp.setDataSource(filepath);
+            mp.setDisplay(surfaceView.getHolder());
+            mp.prepare();
+            mp.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

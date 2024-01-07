@@ -1,10 +1,10 @@
 package com.example.multimedia;
 
 import android.opengl.GLES20;
-import android.util.Log;
+
+import com.example.multimedia.utils.OpenGlUtils;
 
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
 
 public class GLImageHandler {
     // 数据中有多少个顶点，管线就调用多少次顶点着色器

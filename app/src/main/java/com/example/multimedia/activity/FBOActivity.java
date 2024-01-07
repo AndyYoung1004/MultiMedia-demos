@@ -1,24 +1,21 @@
-package com.example.multimedia;
+package com.example.multimedia.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.opengl.GLES30;
-import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.widget.ImageView;
-
+import com.example.multimedia.BaseEGLSurface;
+import com.example.multimedia.R;
+import com.example.multimedia.utils.ShaderUtils;
+import com.example.multimedia.utils.TextureUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 public class FBOActivity extends Activity {
     private ImageView imageView;
