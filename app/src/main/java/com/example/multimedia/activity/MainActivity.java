@@ -29,6 +29,7 @@ public class MainActivity extends ListActivity {
     private final int WATER_MARK_VIEW = 9;
     private final int GL_MULTI_TEXTURES = 10;
     private final int GL_PIC_ROTATE = 11;
+    private final int LOOPER_HANDLER = 12;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +46,7 @@ public class MainActivity extends ListActivity {
         displayList.add("自定义View");
         displayList.add("多纹理");
         displayList.add("图片旋转");
+        displayList.add("Looper");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, displayList);
         setListAdapter(adapter);
@@ -101,6 +103,10 @@ public class MainActivity extends ListActivity {
         } else if (position == GL_PIC_ROTATE) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, GLPICROTATEActivity.class);
+            startActivity(intent);
+        } else if (position == LOOPER_HANDLER) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, LooperHandlerActivity.class);
             startActivity(intent);
         }
     }
