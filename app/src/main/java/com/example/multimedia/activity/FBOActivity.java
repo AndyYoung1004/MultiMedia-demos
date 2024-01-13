@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.net.Uri;
 import android.opengl.GLES30;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import com.example.multimedia.BaseEGLSurface;
 import com.example.multimedia.R;
+import com.example.multimedia.utils.FileUtils;
 import com.example.multimedia.utils.ShaderUtils;
 import com.example.multimedia.utils.TextureUtils;
 import java.nio.ByteBuffer;
@@ -119,6 +122,12 @@ public class FBOActivity extends Activity {
                 @Override
                 public void run() {
                     imageView.setImageBitmap(outputBitmap);
+                }
+            });
+            FileUtils.saveToPictures(getApplicationContext(), outputBitmap, "/sdcard/DCIM/111.jpeg", new FileUtils.OnPictureSavedListener() {
+                @Override
+                public void onPictureSaved(Uri uri) {
+                    Log.d("yangliu", "output file path:" + uri.getPath());
                 }
             });
         }

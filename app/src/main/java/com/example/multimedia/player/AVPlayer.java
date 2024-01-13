@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.Surface;
 
 public class AVPlayer implements IMediaPlayer {
-
+    private static final String TAG = "FinalShaderWrapper";
     private MediaCodecAudioRenderer audioRenderer;
     private MediaCodecVideoRenderer videoRenderer;
     private String filePath;
