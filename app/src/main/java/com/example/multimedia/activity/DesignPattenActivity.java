@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.example.multimedia.R;
 import com.example.multimedia.designpattern.AbstractFactory;
 import com.example.multimedia.designpattern.Color;
+import com.example.multimedia.designpattern.EnumSingleton;
 import com.example.multimedia.designpattern.FactoryProducer;
 import com.example.multimedia.designpattern.Shape;
 import com.example.multimedia.designpattern.ShapeFactory;
@@ -32,5 +33,9 @@ public class DesignPattenActivity extends Activity {
         AbstractFactory shapeFactory = producer.getFactory("shape");
         Shape shape = shapeFactory.getShape("circle");
         shape.draw();
+    }
+
+    void testSingleTon() {
+        EnumSingleton.INSTANCE.doSth();
     }
 }
