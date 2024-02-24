@@ -11,6 +11,7 @@ import com.example.multimedia.designpattern.EnumSingleton;
 import com.example.multimedia.designpattern.FactoryProducer;
 import com.example.multimedia.designpattern.IPlayerInterface;
 import com.example.multimedia.designpattern.MediaAdapter;
+import com.example.multimedia.designpattern.ObserverPattern;
 import com.example.multimedia.designpattern.Shape;
 import com.example.multimedia.designpattern.ShapeFactory;
 
@@ -49,5 +50,13 @@ public class DesignPattenActivity extends Activity {
     void testAdapter() {
         IPlayerInterface player = new MediaAdapter("audio");
         player.play();
+    }
+
+    void testObserver() {
+        ObserverPattern observer = new ObserverPattern();
+        observer.attach(new Object());
+        observer.attach(new Object());
+        observer.updateState();
+        observer.notifyAllObservers();
     }
 }
