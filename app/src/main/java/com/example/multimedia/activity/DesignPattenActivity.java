@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.example.multimedia.R;
 import com.example.multimedia.designpattern.AbstractFactory;
 import com.example.multimedia.designpattern.Color;
+import com.example.multimedia.designpattern.Course;
 import com.example.multimedia.designpattern.EnumSingleton;
 import com.example.multimedia.designpattern.FactoryProducer;
 import com.example.multimedia.designpattern.Shape;
@@ -37,5 +38,9 @@ public class DesignPattenActivity extends Activity {
 
     void testSingleTon() {
         EnumSingleton.INSTANCE.doSth();
+    }
+
+    void testBuilder() {
+        Course course = new Course.CourseBuilder().setName("yangliu").setHomework("123").build();
     }
 }
