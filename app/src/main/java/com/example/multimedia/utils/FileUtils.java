@@ -13,6 +13,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 public class FileUtils {
+
+    public static void savePic(final String fileName, final Bitmap bitmap) {
+        File file = new File(fileName);
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static void saveToPictures(final Context context, final Bitmap bitmap, final String fileName,
                                final OnPictureSavedListener listener) {
         new SaveTask(context, bitmap, fileName, listener).execute();
@@ -42,10 +51,8 @@ public class FileUtils {
         }
 
         private void saveImage(final String fileName, final Bitmap image) {
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             File file = new File(fileName);
             try {
-//                file.getParentFile().mkdirs();
                 image.compress(Bitmap.CompressFormat.JPEG, 80, new FileOutputStream(file));
                 MediaScannerConnection.scanFile(context,
                         new String[]{
