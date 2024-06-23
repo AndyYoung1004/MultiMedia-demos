@@ -110,11 +110,13 @@ public class GLMultiTextureActivity extends Activity {
         }
 
         private void drawBackground() {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGLTextureId);
             // 根据纹理id，顶点和纹理坐标数据绘制图片
             mGLFrameDrawer.onDraw(mGLCubeBuffer, mGLTextureBuffer);
         }
 
         private void drawWatermark() {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mWatermarkTextureId);
             mGLFrameDrawer.onDraw(mGLCubeBuffer2, mGLTextureBuffer);
         }
     }
