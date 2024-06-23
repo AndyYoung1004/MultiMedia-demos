@@ -6,7 +6,7 @@ import com.example.multimedia.utils.OpenGlUtils;
 
 import java.nio.FloatBuffer;
 
-public class GLImageHandler {
+public class GLFrameDrawer {
     // 数据中有多少个顶点，管线就调用多少次顶点着色器
     public static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 position;\n" + // 顶点着色器的顶点坐标,由外部程序传入
@@ -38,11 +38,11 @@ public class GLImageHandler {
     protected int mGLUniformTexture;
     protected int mGLAttribTextureCoordinate;
 
-    public GLImageHandler() {
+    public GLFrameDrawer() {
         this(NO_FILTER_VERTEX_SHADER, NO_FILTER_FRAGMENT_SHADER);
     }
 
-    public GLImageHandler(final String vertexShader, final String fragmentShader) {
+    public GLFrameDrawer(final String vertexShader, final String fragmentShader) {
         mVertexShader = vertexShader;
         mFragmentShader = fragmentShader;
     }

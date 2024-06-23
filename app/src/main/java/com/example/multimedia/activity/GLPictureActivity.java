@@ -10,7 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
-import com.example.multimedia.GLImageHandler;
+import com.example.multimedia.GLFrameDrawer;
 import com.example.multimedia.utils.OpenGlUtils;
 import com.example.multimedia.R;
 
@@ -41,7 +41,7 @@ public class GLPictureActivity extends Activity {
 
     private GLSurfaceView mGLSurfaceView;
     private int mGLTextureId = OpenGlUtils.NO_TEXTURE; // 纹理id
-    private GLImageHandler mGLImageHandler = new GLImageHandler();
+    private GLFrameDrawer mGLFrameDrawer = new GLFrameDrawer();
 
     private FloatBuffer mGLCubeBuffer;
     private FloatBuffer mGLTextureBuffer;
@@ -65,7 +65,7 @@ public class GLPictureActivity extends Activity {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             GLES20.glClearColor(0, 0, 0, 1);
             GLES20.glDisable(GLES20.GL_DEPTH_TEST); // 当我们需要绘制透明图片时，就需要关闭它
-            mGLImageHandler.init();
+            mGLFrameDrawer.init();
 
             // 需要显示的图片
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.thelittleprince);
@@ -99,7 +99,7 @@ public class GLPictureActivity extends Activity {
         public void onDrawFrame(GL10 gl) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
             // 根据纹理id，顶点和纹理坐标数据绘制图片
-            mGLImageHandler.onDraw(mGLCubeBuffer, mGLTextureBuffer);
+            mGLFrameDrawer.onDraw(mGLCubeBuffer, mGLTextureBuffer);
         }
 
         // 调整图片显示大小为居中显示

@@ -10,7 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
-import com.example.multimedia.GLImageHandler;
+import com.example.multimedia.GLFrameDrawer;
 import com.example.multimedia.utils.OpenGlUtils;
 import com.example.multimedia.R;
 
@@ -48,7 +48,7 @@ public class GLMultiTextureActivity extends Activity {
     private GLSurfaceView mGLSurfaceView;
     private int mGLTextureId = OpenGlUtils.NO_TEXTURE; // 纹理id
     private int mWatermarkTextureId = OpenGlUtils.NO_TEXTURE; // 纹理id
-    private GLImageHandler mGLImageHandler = new GLImageHandler();
+    private GLFrameDrawer mGLFrameDrawer = new GLFrameDrawer();
 
     private FloatBuffer mGLCubeBuffer, mGLCubeBuffer2;
     private FloatBuffer mGLTextureBuffer;
@@ -70,7 +70,7 @@ public class GLMultiTextureActivity extends Activity {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             GLES20.glClearColor(0, 0, 0, 1);
             GLES20.glDisable(GLES20.GL_DEPTH_TEST); // 当我们需要绘制透明图片时，就需要关闭它
-            mGLImageHandler.init();
+            mGLFrameDrawer.init();
 
             // 需要显示的图片
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.thelittleprince);
@@ -111,11 +111,11 @@ public class GLMultiTextureActivity extends Activity {
 
         private void drawBackground() {
             // 根据纹理id，顶点和纹理坐标数据绘制图片
-            mGLImageHandler.onDraw(mGLCubeBuffer, mGLTextureBuffer);
+            mGLFrameDrawer.onDraw(mGLCubeBuffer, mGLTextureBuffer);
         }
 
         private void drawWatermark() {
-            mGLImageHandler.onDraw(mGLCubeBuffer2, mGLTextureBuffer);
+            mGLFrameDrawer.onDraw(mGLCubeBuffer2, mGLTextureBuffer);
         }
     }
 }
