@@ -12,8 +12,8 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer {
     private AudioTrack track;
     private byte[] audioTempBuf;
 
-    MediaCodecAudioRenderer(String filePath) {
-        super(filePath, "audio", null);
+    MediaCodecAudioRenderer(String filePath, IExtractor extractor) {
+        super(filePath, "audio", null, extractor);
         audioTempBuf = new byte[10000];
     }
 

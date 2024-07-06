@@ -12,9 +12,17 @@ public class AVExtractor implements IExtractor {
     private String avType;
     private MediaFormat format;
 
-    AVExtractor(String filePath, String avType) {
-        this.filePath = filePath;
-        this.avType = avType;
+    AVExtractor() {
+    }
+
+    @Override
+    public void setDataSource(String input) {
+        this.filePath = input;
+    }
+
+    @Override
+    public void setFileType(String type) {
+        this.avType = type;
     }
 
     @Override

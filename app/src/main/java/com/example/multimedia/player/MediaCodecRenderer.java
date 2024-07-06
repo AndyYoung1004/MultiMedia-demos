@@ -17,10 +17,12 @@ public class MediaCodecRenderer {
     public MediaCodec.BufferInfo bufferInfo;
     private Surface surface;
 
-    MediaCodecRenderer(String filePath, String mime, Surface surface) {
+    MediaCodecRenderer(String filePath, String mime, Surface surface, IExtractor extractor) {
         this.surface = surface;
         this.bufferInfo = new MediaCodec.BufferInfo();
-        this.extractor = new AVExtractor(filePath, mime);
+        this.extractor = extractor;
+        this.extractor.setDataSource(filePath);
+        this.extractor.setFileType(mime);
     }
 
     public void start() {

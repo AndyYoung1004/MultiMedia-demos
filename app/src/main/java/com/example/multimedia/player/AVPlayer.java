@@ -11,6 +11,7 @@ public class AVPlayer implements IMediaPlayer {
     private Surface surface;
     private boolean playerStarted;
     private boolean isAudioOver, isVideoOver;
+    private ExtractorsFactory factory = new DefaultExtractorsFactory();
 
     @Override
     public void setDataSource(String filePath) {
@@ -24,8 +25,8 @@ public class AVPlayer implements IMediaPlayer {
 
     @Override
     public void prepare() {
-        audioRenderer = new MediaCodecAudioRenderer(filePath);
-        videoRenderer = new MediaCodecVideoRenderer(filePath, surface);
+        audioRenderer = new MediaCodecAudioRenderer(filePath, factory.createExtractors()[0]);
+        videoRenderer = new MediaCodecVideoRenderer(filePath, surface, factory.createExtractors()[0]);
         audioRenderer.initMediaCodecRenderer();
         audioRenderer.initAudioTrack();
         videoRenderer.initMediaCodecRenderer();
