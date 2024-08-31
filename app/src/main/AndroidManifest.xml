@@ -34,6 +34,7 @@
         <activity android:name=".activity.GLPICROTATEActivity"/>
         <activity android:name=".activity.LooperHandlerActivity"/>
         <activity android:name=".activity.DesignPattenActivity"/>
+        <activity android:name=".activity.ScreenRecordActivity"/>
     </application>
 
 </manifest>

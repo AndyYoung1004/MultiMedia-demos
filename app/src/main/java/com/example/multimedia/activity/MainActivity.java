@@ -30,6 +30,7 @@ public class MainActivity extends ListActivity {
     private final int GL_MULTI_TEXTURES = 10;
     private final int GL_PIC_ROTATE = 11;
     private final int LOOPER_HANDLER = 12;
+    private final int SCREEN_RECORD = 13;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +48,7 @@ public class MainActivity extends ListActivity {
         displayList.add("多纹理");
         displayList.add("图片旋转");
         displayList.add("Looper");
+        displayList.add("录屏");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, displayList);
         setListAdapter(adapter);
@@ -107,6 +109,10 @@ public class MainActivity extends ListActivity {
         } else if (position == LOOPER_HANDLER) {
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, LooperHandlerActivity.class);
+            startActivity(intent);
+        } else if (position == SCREEN_RECORD) {
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, ScreenRecordActivity.class);
             startActivity(intent);
         }
     }
